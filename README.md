@@ -57,7 +57,7 @@ Find the perfect time for any task:
 
 1. **Install the plugin**:
    ```bash
-   claude plugin install /path/to/personal-assistant-plugin
+   claude plugin install https://github.com/kjenney/personal-assistant-plugin
    ```
 
 2. **Set up Google Cloud credentials** (see [SETUP.md](SETUP.md))
