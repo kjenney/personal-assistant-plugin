@@ -50,46 +50,50 @@ This guide will walk you through setting up the Personal Assistant plugin for Cl
 
 1. Go to "APIs & Services" → "Credentials"
 2. Click "Create Credentials" → "OAuth client ID"
-3. Select "Desktop app" as application type
+3. Select **"Desktop app"** as application type (or "Web application" with redirect URI `http://localhost:3000/oauth2callback`)
 4. Name it "Claude Desktop Client"
 5. Click "Create"
-6. **Important**: Download the JSON file and save it securely
-7. Note your **Client ID** and **Client Secret**
+6. **Important**: Click "Download JSON" and save the file
+7. Rename the downloaded file to `gcp-oauth.keys.json`
 
-## Step 2: Configure Environment Variables
+## Step 2: Configure Gmail OAuth
 
-You'll need to set up environment variables for the MCP servers. Create a secure location for your credentials.
+### 2.1 Set Up Gmail MCP Authentication
 
-### 2.1 For Gmail MCP
-
-1. Generate an encryption key:
+1. Create the Gmail MCP configuration directory:
 ```bash
-python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+mkdir -p ~/.gmail-mcp
 ```
 
-2. Save this key securely - you'll need it for the `TOKEN_ENCRYPTION_KEY` variable
+2. Move your OAuth keys file to this directory:
+```bash
+mv ~/Downloads/gcp-oauth.keys.json ~/.gmail-mcp/
+```
 
-### 2.2 For Google Calendar MCP
+3. Run the authentication setup:
+```bash
+npx @gongrzhe/server-gmail-autoauth-mcp auth
+```
 
-1. Save your downloaded OAuth credentials JSON file to a secure location
-2. Note the full path to this file
+4. Follow the browser prompts to authenticate with your Google account
+5. Grant the requested Gmail permissions
+6. Credentials will be stored automatically in `~/.gmail-mcp/credentials.json`
 
-### 2.3 Set Environment Variables
+### 2.2 Configure Google Calendar MCP (Optional)
 
-Add these to your shell profile (`~/.zshrc`, `~/.bashrc`, or `~/.bash_profile`):
+If you need to set a specific OAuth credentials path for Google Calendar:
 
 ```bash
-# Google OAuth Credentials
-export GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="your-client-secret"
-export TOKEN_ENCRYPTION_KEY="your-generated-encryption-key"
-export GOOGLE_OAUTH_CREDENTIALS="/path/to/your/gcp-oauth.keys.json"
+# Add to your shell profile (~/.zshrc, ~/.bashrc, or ~/.bash_profile)
+export GOOGLE_OAUTH_CREDENTIALS="$HOME/.gmail-mcp/gcp-oauth.keys.json"
 ```
 
 **Reload your shell**:
 ```bash
 source ~/.zshrc  # or ~/.bashrc
 ```
+
+Note: The Google Calendar MCP will handle authentication automatically on first use.
 
 ## Step 3: Install the Plugin
 
@@ -127,19 +131,22 @@ claude plugin install personal-assistant@marketplace-name
 /morning-brief
 ```
 
-## Step 5: Initial Authentication
+## Step 5: Verify Authentication
 
 ### Gmail Authentication
+
+Gmail authentication was completed in Step 2. To verify it's working:
 
 1. In Claude Code, try a command that uses Gmail:
 ```
 Can you check my recent emails?
 ```
 
-2. The first time, you'll be redirected to a browser for OAuth authentication
-3. Sign in with your Google account
-4. Grant the requested permissions
-5. You'll be redirected back - authentication is complete
+2. If authentication was successful, you should see your emails
+3. If you need to re-authenticate, run:
+```bash
+npx @gongrzhe/server-gmail-autoauth-mcp auth
+```
 
 ### Calendar Authentication
 
@@ -148,8 +155,10 @@ Can you check my recent emails?
 What's on my calendar today?
 ```
 
-2. Follow the OAuth flow similar to Gmail
-3. Grant calendar permissions
+2. On first use, you'll be redirected to a browser for OAuth authentication
+3. Sign in with your Google account
+4. Grant the requested calendar permissions
+5. Authentication is complete
 
 ## Step 6: Test the Slash Commands
 
@@ -186,30 +195,44 @@ Try out the personal assistant commands:
 
 If you encounter authentication problems:
 
-1. **Check credentials**: Verify your environment variables are set correctly
-2. **Token location**: Tokens are stored in Claude Code's config directory
-3. **Re-authenticate**: Remove token files and authenticate again
-4. **OAuth redirect URI**: Ensure it matches your Cloud Console settings
+1. **Gmail authentication**:
+   - Verify `~/.gmail-mcp/gcp-oauth.keys.json` exists and is valid
+   - Re-authenticate: `npx @gongrzhe/server-gmail-autoauth-mcp auth`
+   - Check that credentials are stored in `~/.gmail-mcp/credentials.json`
+   - Ensure OAuth client type is "Desktop app" or "Web application" with correct redirect URI
+
+2. **Calendar authentication**:
+   - Token location: Tokens are stored in Claude Code's config directory
+   - Re-authenticate: Remove token files and authenticate again
+   - OAuth redirect URI: Ensure it matches your Cloud Console settings
 
 ### MCP Server Issues
 
 If MCP servers aren't loading:
 
 1. **Check installation**:
-```bash
-npx @smithery/cli doctor
-```
 
-2. **Verify environment variables**:
+* Run `claude` 
+* Type `/mcp`
+* Check status of MCP servers
+
+2. **Verify Gmail MCP configuration**:
 ```bash
-echo $GOOGLE_CLIENT_ID
+# Check that OAuth keys file exists
+ls -l ~/.gmail-mcp/gcp-oauth.keys.json
+
+# Check that credentials were created
+ls -l ~/.gmail-mcp/credentials.json
+
+# Optional: Check Calendar environment variable if set
 echo $GOOGLE_OAUTH_CREDENTIALS
 ```
 
 3. **Check Claude Code logs**:
 ```bash
-claude logs
+claude --verbose
 ```
+(Use the --verbose flag with any claude command to enable detailed logging)
 
 ### Permission Errors
 
@@ -229,11 +252,12 @@ If you hit rate limits:
 
 ## Security Best Practices
 
-1. **Never commit credentials**: Keep OAuth files and environment variables secure
-2. **Use encryption**: The Gmail MCP uses encrypted token storage
-3. **Regular rotation**: Periodically rotate your OAuth credentials
-4. **Minimal scopes**: Only grant necessary permissions
-5. **Monitor access**: Regularly check Google account activity
+1. **Never commit credentials**: Keep OAuth files (`gcp-oauth.keys.json`) and stored credentials secure
+2. **Secure storage**: OAuth keys and credentials are stored in `~/.gmail-mcp/` - keep this directory protected
+3. **Use encryption**: The Gmail MCP server automatically handles secure token storage
+4. **Regular rotation**: Periodically rotate your OAuth credentials in Google Cloud Console
+5. **Minimal scopes**: Only grant necessary permissions
+6. **Monitor access**: Regularly check Google account activity and authorized applications
 
 ## Updating the Plugin
 
@@ -261,7 +285,7 @@ If you encounter issues:
 
 1. Check the [Claude Code documentation](https://docs.claude.com/en/docs/claude-code)
 2. Review [MCP documentation](https://modelcontextprotocol.io/)
-3. Check plugin logs: `claude logs`
+3. Check plugin logs: `claude --verbose`
 4. File an issue in the plugin repository
 
 ## What's Next?

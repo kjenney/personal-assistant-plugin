@@ -83,7 +83,7 @@ See [SETUP.md](SETUP.md) for detailed installation and configuration instruction
 ## MCP Servers
 
 This plugin uses two Model Context Protocol servers:
-- **Gmail MCP** (`@bastienchabal/gmail-mcp`) - For email integration
+- **Gmail MCP** (`@gongrzhe/server-gmail-autoauth-mcp`) - For email integration with automatic OAuth authentication
 - **Google Calendar MCP** (`@cocal/google-calendar-mcp`) - For calendar integration
 
 Both servers are automatically configured and managed by the plugin.
