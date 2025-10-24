@@ -1,0 +1,37 @@
+# Environment files
+.env
+.env.local
+
+# OAuth credentials
+gcp-oauth.keys.json
+credentials.json
+token.json
+tokens.json
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Claude Code local config
+.claude/local/
+CLAUDE.md

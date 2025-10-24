@@ -1,0 +1,37 @@
+{
+  "hooks": [
+    {
+      "name": "morning-reminder",
+      "description": "Reminds user to run morning briefing",
+      "event": "UserPromptSubmit",
+      "command": "bash",
+      "args": [
+        "-c",
+        "hour=$(date +%H); if [ $hour -ge 6 ] && [ $hour -lt 10 ] && [ ! -f /tmp/morning-brief-shown-$(date +%Y%m%d) ]; then touch /tmp/morning-brief-shown-$(date +%Y%m%d); echo '{\"action\": \"passthrough\", \"message\": \"Good morning! Consider running /morning-brief to start your day.\"}'; else echo '{\"action\": \"passthrough\"}'; fi"
+      ],
+      "output": "json"
+    },
+    {
+      "name": "email-context",
+      "description": "Adds context when discussing emails",
+      "event": "PreToolUse",
+      "command": "bash",
+      "args": [
+        "-c",
+        "if echo \"$TOOL_NAME\" | grep -iq 'gmail\\|email'; then echo '{\"action\": \"passthrough\", \"message\": \"📧 Accessing Gmail...\"}'; else echo '{\"action\": \"passthrough\"}'; fi"
+      ],
+      "output": "json"
+    },
+    {
+      "name": "calendar-context",
+      "description": "Adds context when discussing calendar",
+      "event": "PreToolUse",
+      "command": "bash",
+      "args": [
+        "-c",
+        "if echo \"$TOOL_NAME\" | grep -iq 'calendar'; then echo '{\"action\": \"passthrough\", \"message\": \"📅 Checking Calendar...\"}'; else echo '{\"action\": \"passthrough\"}'; fi"
+      ],
+      "output": "json"
+    }
+  ]
+}
