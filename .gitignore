@@ -35,3 +35,5 @@ venv/
 # Claude Code local config
 .claude/local/
 CLAUDE.md
+marketplace.json
+

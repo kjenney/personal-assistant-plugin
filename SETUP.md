@@ -93,31 +93,39 @@ source ~/.zshrc  # or ~/.bashrc
 
 ## Step 3: Install the Plugin
 
-### Option A: Install from Local Directory
+### For Local Development
 
-1. Clone or download this repository
-2. Navigate to the plugin directory
-3. Install the plugin:
+1. Clone this repository:
 ```bash
-cd /path/to/personal-assistant-plugin
-claude plugin install .
+git clone https://github.com/kjenney/personal-assistant-plugin
+cd personal-assistant-plugin
 ```
 
-### Option B: Install from Git Repository
-
+2. Add the local marketplace:
 ```bash
-claude plugin install https://github.com/yourusername/personal-assistant-plugin
+claude plugin marketplace add ./marketplace.json
+```
+
+3. Install the plugin from the local marketplace:
+```bash
+claude plugin install personal-assistant@personal-assistant-dev
+```
+
+### From a Published Marketplace (Future)
+
+Once published to a marketplace, you'll be able to install with:
+```bash
+claude plugin install personal-assistant@marketplace-name
 ```
 
 ## Step 4: Verify Installation
 
-1. Start Claude Code
-2. Check that the plugin is loaded:
-```bash
-claude plugin list
-```
+1. The plugin should be successfully installed. You can verify by checking if the slash commands are available.
 
-3. You should see "personal-assistant" in the list
+2. Try running one of the plugin commands (after completing authentication setup in Step 5):
+```
+/morning-brief
+```
 
 ## Step 5: Initial Authentication
 
@@ -229,17 +237,22 @@ If you hit rate limits:
 
 ## Updating the Plugin
 
-To update to the latest version:
+To update to the latest version (for local development):
 
 ```bash
-claude plugin update personal-assistant
+# Pull the latest changes
+git pull
+
+# Reinstall the plugin
+claude plugin uninstall personal-assistant
+claude plugin install personal-assistant@personal-assistant-dev
 ```
 
-Or reinstall from the repository:
+Or from a published marketplace:
 
 ```bash
 claude plugin uninstall personal-assistant
-claude plugin install https://github.com/yourusername/personal-assistant-plugin
+claude plugin install personal-assistant@marketplace-name
 ```
 
 ## Getting Help

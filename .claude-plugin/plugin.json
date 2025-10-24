@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "A personal assistant plugin that integrates Gmail and Google Calendar to help coordinate tasks, manage emails, and schedule meetings",
   "author": {
-    "name": "Personal Assistant Plugin",
-    "email": "assistant@example.com"
+    "name": "Ken Jenney",
+    "email": "me@kenjenney.com"
   },
   "keywords": [
     "gmail",
@@ -14,7 +14,6 @@
     "scheduling",
     "email"
   ],
-  "commands": "commands",
-  "hooks": "hooks",
-  "mcpServers": ".mcp.json"
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
 }
